@@ -1,0 +1,17 @@
+{% extends 'base.html.twig' %}
+
+{% block body %}
+    <h1>Edit Task: {{ todo.title }}</h1>
+
+    {# Show flash messages #}
+    {% for message in app.flashes('success') %}
+        <div class="alert alert-success">{{ message }}</div>
+    {% endfor %}
+
+    {{ form_start(form) }}
+        {{ form_widget(form) }}
+        <button class="btn btn-primary">Update</button>
+    {{ form_end(form) }}
+
+    <p><a href="{{ path('todo_list') }}">Back to list</a></p>
+{% endblock %}
