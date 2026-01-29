@@ -4,34 +4,48 @@
 
 {% block body %}
 <div class="container mt-5">
-    <div class="row justify-content-center">
-        <div class="col-md-8">
+  <div class="row justify-content-center">
+    <div class="col-md-8">
 
-            <div class="card shadow-lg border-0 rounded">
-                <div class="card-header bg-success text-white text-center">
-                    <h2 class="mb-0">Welcome to the To‑Do App</h2>
-                </div>
-                <div class="card-body text-center p-4">
-                    <p class="lead mb-4">
-                        Organize your tasks, stay productive, and keep track of what matters most.
-                    </p>
-
-                    <div class="d-grid gap-3 d-md-flex justify-content-md-center">
-                        <a href="{{ path('todo_list') }}" class="btn btn-primary btn-lg">
-                            <i class="bi bi-list-check"></i> View Tasks
-                        </a>
-                        <a href="{{ path('todo_new') }}" class="btn btn-success btn-lg">
-                            <i class="bi bi-plus-circle"></i> Create New Task
-                        </a>
-                    </div>
-                </div>
-            </div>
-
-            <div class="text-center mt-4">
-                <small class="text-muted">Manage your to‑dos efficiently and never miss a deadline.</small>
-            </div>
-
+      <div class="card shadow-lg border-0 rounded">
+        <div class="card-header bg-success text-white text-center">
+          <h2 class="mb-0">Welcome to the To‑Do App</h2>
         </div>
+
+        <div class="card-body text-center p-4">
+          <p class="lead mb-4">
+            Organize your tasks, stay productive, and keep track of what matters most.
+          </p>
+
+          <div id="jwtHint" class="alert alert-warning d-none">
+            You are not logged in. Please <a href="{{ path('app_login') }}">login</a> to manage your tasks.
+          </div>
+
+          <div class="d-grid gap-3 d-md-flex justify-content-md-center">
+            <a href="{{ path('todo_list') }}" class="btn btn-primary btn-lg">
+              <i class="bi bi-list-check"></i> View Tasks
+            </a>
+            <a href="{{ path('todo_new') }}" class="btn btn-success btn-lg">
+              <i class="bi bi-plus-circle"></i> Create New Task
+            </a>
+          </div>
+        </div>
+      </div>
+
+      <div class="text-center mt-4">
+        <small class="text-muted">Manage your to‑dos efficiently and never miss a deadline.</small>
+      </div>
+
     </div>
+  </div>
 </div>
+
+<script>
+  document.addEventListener('DOMContentLoaded', () => {
+    const token = localStorage.getItem('jwt_token');
+    if (!token) {
+      document.getElementById('jwtHint').classList.remove('d-none');
+    }
+  });
+</script>
 {% endblock %}

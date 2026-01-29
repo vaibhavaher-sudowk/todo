@@ -4,75 +4,95 @@
 
 {% block body %}
 <div class="container mt-5">
-    <div class="row justify-content-center">
-        <div class="col-md-6">
+  <div class="row justify-content-center">
+    <div class="col-md-6">
 
-            <div class="card shadow-lg border-0 rounded">
-                <div class="card-header bg-primary text-white text-center">
-                    <h2 class="mb-0">Welcome Back</h2>
-                </div>
-                <div class="card-body p-4">
+      <div class="card shadow-lg border-0 rounded">
+        <div class="card-header bg-primary text-white text-center">
+          <h2 class="mb-0">Welcome Back</h2>
+        </div>
 
-                    {# Show login error if any #}
-                    {% if error %}
-                        <div class="alert alert-danger">
-                            {{ error.messageKey|trans(error.messageData, 'security') }}
-                        </div>
-                    {% endif %}
+        <div class="card-body p-4">
 
-                    {# Show user info if already logged in #}
-                    {% if app.user %}
-                        <div class="alert alert-info mb-3">
-                            You are logged in as <strong>{{ app.user.userIdentifier }}</strong>.
-                            <a href="{{ path('app_logout') }}" class="btn btn-sm btn-outline-light ms-2">Logout</a>
-                        </div>
-                    {% endif %}
+          <div id="loginError" class="alert alert-danger d-none"></div>
 
-                    <form method="post" action="{{ path('app_login') }}">
-                        <div class="mb-3">
-                            <label for="inputEmail" class="form-label">Email address</label>
-                            <input type="email"
-                                   id="inputEmail"
-                                   name="_username"
-                                   value="{{ last_username }}"
-                                   class="form-control"
-                                   placeholder="Enter your email"
-                                   autocomplete="email"
-                                   required autofocus>
-                        </div>
-
-                        <div class="mb-3">
-                            <label for="inputPassword" class="form-label">Password</label>
-                            <input type="password"
-                                   id="inputPassword"
-                                   name="_password"
-                                   class="form-control"
-                                   placeholder="Enter your password"
-                                   autocomplete="current-password"
-                                   required>
-                        </div>
-
-                        <input type="hidden" name="_csrf_token" value="{{ csrf_token('authenticate') }}">
-
-                        <div class="form-check mb-3">
-                            <input type="checkbox" name="_remember_me" class="form-check-input" id="rememberMe">
-                            <label class="form-check-label" for="rememberMe">Remember me</label>
-                        </div>
-
-                        <div class="d-grid">
-                            <button class="btn btn-success btn-lg" type="submit">
-                                <i class="bi bi-box-arrow-in-right"></i> Sign in
-                            </button>
-                        </div>
-                    </form>
-                </div>
+          <form id="jwtLoginForm">
+            <div class="mb-3">
+              <label for="inputEmail" class="form-label">Email address</label>
+              <input type="email" id="inputEmail" class="form-control"
+                     placeholder="Enter your email" autocomplete="email" required autofocus>
             </div>
 
-            <div class="text-center mt-3">
-                <small>Don’t have an account? <a href="{{ path('app_register') }}">Register here</a></small>
+            <div class="mb-3">
+              <label for="inputPassword" class="form-label">Password</label>
+              <input type="password" id="inputPassword" class="form-control"
+                     placeholder="Enter your password" autocomplete="current-password" required>
             </div>
+
+            <div class="d-grid">
+              <button class="btn btn-success btn-lg" type="submit">
+                <i class="bi bi-box-arrow-in-right"></i> Sign in
+              </button>
+            </div>
+          </form>
 
         </div>
+      </div>
+
+      <div class="text-center mt-3">
+        <small>Don’t have an account? <a href="{{ path('app_register') }}">Register here</a></small>
+      </div>
+
     </div>
+  </div>
 </div>
+
+<script>
+  const form = document.getElementById('jwtLoginForm');
+  const errorBox = document.getElementById('loginError');
+
+  form.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    errorBox.classList.add('d-none');
+    errorBox.textContent = '';
+
+    const email = document.getElementById('inputEmail').value.trim();
+    const password = document.getElementById('inputPassword').value;
+
+    try {
+      const res = await fetch('/api/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email, password })
+      });
+
+      let data = {};
+      try {
+        data = await res.json();
+      } catch (e) {
+        data = {};
+      }
+
+      if (!res.ok) {
+        errorBox.textContent = data.message || 'Login failed (check email/password)';
+        errorBox.classList.remove('d-none');
+        return;
+      }
+
+      if (!data.token) {
+        errorBox.textContent = 'Token not received from server';
+        errorBox.classList.remove('d-none');
+        return;
+      }
+
+      localStorage.setItem('jwt_token', data.token);
+
+      // Redirect after login
+      window.location.href = '/todo';
+    } catch (err) {
+      errorBox.textContent = 'Network error. Please try again.';
+      errorBox.classList.remove('d-none');
+    }
+  });
+</script>
 {% endblock %}

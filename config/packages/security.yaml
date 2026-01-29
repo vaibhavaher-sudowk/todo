@@ -1,52 +1,44 @@
 security:
-  # Password hashing
   password_hashers:
-    Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface: 'auto'
-    App\Entity\User:
-      algorithm: auto
+    App\Entity\User: 'auto'
 
-  # User provider
   providers:
     app_user_provider:
       entity:
-        class: App\Entity\User   # <-- make sure this matches your actual User entity class
+        class: App\Entity\User
         property: email
 
-  # Firewalls
   firewalls:
     dev:
       pattern: ^/(_(profiler|wdt)|css|images|js)/
       security: false
 
+    # ✅ JWT firewall for API (stateless)
+    api:
+      pattern: ^/api
+      stateless: true
+      provider: app_user_provider
+
+      json_login:
+        check_path: /api/login
+        username_path: email
+        password_path: password
+        success_handler: lexik_jwt_authentication.handler.authentication_success
+        failure_handler: lexik_jwt_authentication.handler.authentication_failure
+
+      jwt: ~
+
+    # ✅ Your old website firewall (can keep it)
     main:
       lazy: true
       provider: app_user_provider
-      form_login:
-        login_path: app_login
-        check_path: app_login
-        enable_csrf: true
-        default_target_path: todo_list
-        # IMPORTANT: leave defaults so Symfony expects "_username" and "_password"
-      logout:
-        path: app_logout
-        target: todo_index
-      remember_me:
-        secret: '%kernel.secret%'
-        lifetime: 604800
-        path: /
-        # always_remember_me: true
+      # keep form login if you still want session login for Twig pages:
+      # form_login:
+      #   login_path: app_login
+      #   check_path: app_login
+      # logout:
+      #   path: app_logout
 
-  # Access control rules
   access_control:
-    - { path: ^/login, roles: PUBLIC_ACCESS }
-    - { path: ^/register, roles: PUBLIC_ACCESS }
-    - { path: ^/todo, roles: ROLE_USER }
-
-when@test:
-  security:
-    password_hashers:
-      Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface:
-        algorithm: auto
-        cost: 4
-        time_cost: 3
-        memory_cost: 10
+    - { path: ^/api/login, roles: PUBLIC_ACCESS }
+    - { path: ^/api, roles: IS_AUTHENTICATED_FULLY }

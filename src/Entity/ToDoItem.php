@@ -23,14 +23,14 @@ class ToDoItem
     #[ORM\Column(length: 50)]
     private ?string $status = null;
 
-    #[ORM\Column]
+    #[ORM\Column(type: Types::INTEGER)]
     private ?int $priority = null;
 
-    #[ORM\Column(nullable: true)]
-    private ?\DateTime $dueDate = null;
+    #[ORM\Column(type: Types::DATETIME_MUTABLE, nullable: true)]
+    private ?\DateTimeInterface $dueDate = null;
 
-    #[ORM\Column]
-    private ?\DateTime $createdDate = null;
+    #[ORM\Column(type: Types::DATETIME_MUTABLE)]
+    private ?\DateTimeInterface $createdDate = null;
 
     public function getId(): ?int
     {
@@ -42,10 +42,9 @@ class ToDoItem
         return $this->title;
     }
 
-    public function setTitle(string $title): static
+    public function setTitle(string $title): self
     {
         $this->title = $title;
-
         return $this;
     }
 
@@ -54,10 +53,9 @@ class ToDoItem
         return $this->description;
     }
 
-    public function setDescription(?string $description): static
+    public function setDescription(?string $description): self
     {
         $this->description = $description;
-
         return $this;
     }
 
@@ -66,10 +64,9 @@ class ToDoItem
         return $this->status;
     }
 
-    public function setStatus(string $status): static
+    public function setStatus(string $status): self
     {
         $this->status = $status;
-
         return $this;
     }
 
@@ -78,34 +75,31 @@ class ToDoItem
         return $this->priority;
     }
 
-    public function setPriority(int $priority): static
+    public function setPriority(int $priority): self
     {
         $this->priority = $priority;
-
         return $this;
     }
 
-    public function getDueDate(): ?\DateTime
+    public function getDueDate(): ?\DateTimeInterface
     {
         return $this->dueDate;
     }
 
-    public function setDueDate(?\DateTime $dueDate): static
+    public function setDueDate(?\DateTimeInterface $dueDate): self
     {
         $this->dueDate = $dueDate;
-
         return $this;
     }
 
-    public function getCreatedDate(): ?\DateTime
+    public function getCreatedDate(): ?\DateTimeInterface
     {
         return $this->createdDate;
     }
 
-    public function setCreatedDate(\DateTime $createdDate): static
+    public function setCreatedDate(\DateTimeInterface $createdDate): self
     {
         $this->createdDate = $createdDate;
-
         return $this;
     }
 }
